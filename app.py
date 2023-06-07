@@ -4,67 +4,97 @@ import math
 
 app = Flask(__name__)
 
-parking_lots = {}
-lots_in_use = []
+workQueue = []
+workComplete = []
+maxNumOfWorkers = 2
+numOfWorkers = 0
 
 
-@app.route('/entry', methods=['POST'])
-def entry():
-    plate = request.args.get('plate')
-    parking_lot = request.args.get('parkingLot')
-    if not plate or not parking_lot:
-        return 'Missing plate or parkingLot parameter', 400
+@app.route('/enqueue', methods=['PUT'])
+def enqueue():
+    iterations_num = request.args.get('iterations')
+    data = request.data.decode('utf-8')
+    if not iterations_num or not data:
+        return 'Missing iterations or data parameters', 400
 
-    if parking_lot in lots_in_use:
-        return 'Parking lot already in use', 400
+    iterations_num = int(iterations_num)
+    workQueue.append((data, iterations_num, datetime.now()))
+    if not numOfWorkers:
+        spawn_worker()
 
-    ticket_id = datetime.now().strftime('%Y%m%d%H%M%S%f')
-    parking_lots[ticket_id] = {
-        'plate': plate,
-        'parking_lot': parking_lot,
-        'entry_time': datetime.now()
-    }
-
-    lots_in_use.append(parking_lot)
-
-    return jsonify({
-        'license_plate': plate,
-        'parking_lot_id': parking_lot,
-        'entry_time': parking_lots[ticket_id]['entry_time'],
-        'ticket_id': ticket_id
-    })
+    # # TODO: check if task_id below is relevant
+    # task_id = datetime.now().strftime('%Y%m%d%H%M%S%f')
+    # return jsonify({
+    #     'task_id': task_id
+    # })
+    return 'Task accepted', 200
 
 
-@app.route('/exit', methods=['POST'])
-def exit_parking():
-    ticket_id = request.args.get('ticketId')
+@app.route('/pullTask', methods=['GET'])
+def pull_task():
+    if workQueue:
+        return workQueue.pop()
+    return None
 
-    if not ticket_id:
-        return 'Missing ticketId parameter', 400
-    if ticket_id not in parking_lots:
-        return 'Invalid ticketId', 400
 
-    ticket = parking_lots[ticket_id]
-    parking_lot_id = ticket['parking_lot']
-    license_plate = ticket['plate']
-    start_time = ticket['entry_time']
-    end_time = datetime.now()
+@app.route('/completed', methods=['PUT'])
+def put_completed():
+    data = request.data.decode('utf-8')
+    if not data:
+        return 'Missing data parameters', 400
 
-    parking_time = end_time - start_time
-    parking_hours = parking_time.total_seconds() / 3600.0
-    parking_hours_rounded = math.ceil(parking_hours * 4) / 4.0
-    parking_charge = parking_hours_rounded * 10.0
+    workComplete.append(data)
 
-    lots_in_use.remove(parking_lot_id)
-    del parking_lots[ticket_id]
+    return 'success'
 
-    return jsonify({
-        'license_plate': license_plate,
-        'parking_lot_id': parking_lot_id,
-        'parking_time': str(parking_time),
-        'charge': parking_charge
-    })
+
+@app.route('/pullCompleted', methods=['POST'])
+def pull_completed_tasks():
+    number_of_completed_tasks = int(request.args.get('top'))
+
+    if not number_of_completed_tasks:
+        return 'Missing top parameter', 400
+
+    # TODO: check if this is the correct way to return the results
+    result = []
+    if len(workComplete) > number_of_completed_tasks:
+        for i in range(number_of_completed_tasks):
+            result.append(workComplete.pop())
+        return result
+    elif len(workComplete) > 0:
+        for i in range(len(workComplete)):
+            result.append(workComplete.pop())
+        return result
+    else:
+        try:
+            # TODO: should otherNode return to user directly?
+            # return otherNode.pullCompleteInternal(n)
+            pass
+        # TODO: check what to return if there are no results
+        except:
+            return []
+
+
+def timer_for_new_worker():
+    # rate limit - number of new workers per time period
+    # rate limit - total number of new workers
+    # check the Queue is not empty
+    if (datetime.now() - workQueue[-1][-1]) > 15:
+        if numOfWorkers < maxNumOfWorkers:
+            spawn_worker()
+        else:
+            # if otherNode.TryGetNodeQuota():
+            #     maxNumOfWorkers+=1
+            pass
+
+
+def spawn_worker():
+    pass
+
+
+def add_sibling(other):
+    pass
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
