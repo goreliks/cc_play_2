@@ -43,3 +43,20 @@ PUBLIC_IP_2=$(aws ec2 describe-instances \
 echo "Flask web servers deployed successfully!"
 echo "The URL for the first web server is http://${PUBLIC_IP_1}:5000"
 echo "The URL for the second web server is http://${PUBLIC_IP_2}:5000"
+
+aws ec2 modify-instance-attribute \
+  --instance-id $INSTANCE_ID_1 \
+  --user-data "echo 'MY_IP=${PUBLIC_IP_1}' >> /etc/environment"
+
+aws ec2 modify-instance-attribute \
+  --instance-id $INSTANCE_ID_1 \
+  --user-data "echo 'SIBLING_IP=${PUBLIC_IP_2}' >> /etc/environment"
+
+echo "Saving own IP address instance 2..."
+aws ec2 modify-instance-attribute \
+  --instance-id $INSTANCE_ID_2 \
+  --user-data "echo 'MY_IP=${PUBLIC_IP_2}' >> /etc/environment"
+
+aws ec2 modify-instance-attribute \
+  --instance-id $INSTANCE_ID_2 \
+  --user-data "echo 'SIBLING_IP=${PUBLIC_IP_1}' >> /etc/environment"
