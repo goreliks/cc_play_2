@@ -14,8 +14,25 @@ workComplete = []
 maxNumOfWorkers = 3
 numOfWorkers = 0
 SIBLING_IP = None
-OWN_IP = os.getenv('OWN_IP')
+OWN_IP = None
 processing_thread = None
+
+
+@app.route('/addIPs', methods=['PUT'])
+def add_ips():
+    data = request.get_json()
+    own_ip = data.get('own_ip')
+    sibling_ip = data.get('sibling_ip')
+
+    if own_ip and sibling_ip:
+        global SIBLING_IP
+        global OWN_IP
+        SIBLING_IP = sibling_ip
+        OWN_IP = own_ip
+
+        return 'IPs added successfully'
+    else:
+        return 'Invalid IP addresses', 400
 
 
 @app.route('/enqueue', methods=['PUT'])
@@ -50,7 +67,7 @@ def pull_task():
             'iterations': response[1]
         })
     else:
-        return None
+        return []
 
 
 # ENDPOINT FOR WORKER TO PUTT COMPLETED TASK
@@ -85,13 +102,12 @@ def pull_completed_tasks():
         return result
     else:
         try:
+            global SIBLING_IP
             url = f'http://{SIBLING_IP}:5000/pullCompletedInternal?top={number_of_completed_tasks}'
             response = requests.post(url)
             if response.status_code == 200:
                 data = response.json()
                 return data
-            pass
-        # TODO: check what to return if there are no results
         except:
             return []
 
@@ -147,8 +163,11 @@ def spawn_worker():
         instance_type = 't2.micro'
         ami_id = 'ami-00aa9d3df94c6c354'
 
-        own_ip = os.getenv('OWN_IP')
-        sibling_ip = os.getenv('SIBLING_IP')
+        global OWN_IP
+        global SIBLING_IP
+
+        own_ip = OWN_IP
+        sibling_ip = SIBLING_IP
 
         with open('worker.py', 'r') as file:
             worker_code = file.read()
@@ -184,15 +203,6 @@ def spawn_worker():
         return False
 
 
-def add_sibling():
-    sibling_ip = os.getenv('SIBLING_IP')
-    if sibling_ip:
-        return sibling_ip
-    else:
-        return None
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
-    SIBLING_IP = add_sibling()
 
