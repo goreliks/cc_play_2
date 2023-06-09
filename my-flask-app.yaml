@@ -1,9 +1,29 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
+  EC2InstanceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'ec2.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonEC2FullAccess'
+
+  EC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - Ref: EC2InstanceRole
+
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
+      IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: ami-00aa9d3df94c6c354
       InstanceType: t2.micro
       SecurityGroupIds:
@@ -19,9 +39,11 @@ Resources:
           cd cc_play_2
           export FLASK_APP=app.py
           nohup flask run --host=0.0.0.0 &
+
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
+      IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: ami-00aa9d3df94c6c354
       InstanceType: t2.micro
       SecurityGroupIds:
@@ -37,6 +59,7 @@ Resources:
           cd cc_play_2
           export FLASK_APP=app.py
           nohup flask run --host=0.0.0.0 &
+
   WebServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

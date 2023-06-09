@@ -159,7 +159,7 @@ def timer_for_new_worker():
 
 def spawn_worker():
     try:
-        ec2_worker = boto3.client('ec2')
+        ec2_worker = boto3.resource('ec2', region_name='eu-west-1')
         instance_type = 't2.micro'
         ami_id = 'ami-00aa9d3df94c6c354'
 
@@ -184,24 +184,24 @@ def spawn_worker():
         nohup python3 ./worker.py
         '''
 
-        response = ec2_worker.run_instances(
+        instance = ec2_worker.create_instances(
             ImageId=ami_id,
             InstanceType=instance_type,
-            Region='eu-west-1',
             InstanceInitiatedShutdownBehavior='terminate',
             MinCount=1,
             MaxCount=1,
             UserData=user_data
         )
 
-        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            global numOfWorkers
-            numOfWorkers += 1
-            return True
+        instance_id = instance[0].id
 
     except Exception as e:
         print('Worker creation fail', e)
         return False
+
+    global numOfWorkers
+    numOfWorkers += 1
+    return True
 
 
 if __name__ == '__main__':

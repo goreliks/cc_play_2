@@ -11,6 +11,7 @@ aws cloudformation create-stack \
   --stack-name $STACK_NAME \
   --template-body file://$TEMPLATE_FILE \
   --region $REGION \
+  --capabilities CAPABILITY_IAM \
 
 # Wait for stack to complete
 echo "Waiting for stack to be created..."
