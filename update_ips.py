@@ -1,5 +1,6 @@
 import sys
 import requests
+import time
 
 
 def update_ips(ip1, ip2):
@@ -27,8 +28,11 @@ def update_ips(ip1, ip2):
         response2.raise_for_status()
 
         print('IPs updated successfully')
+        return True
     except requests.exceptions.RequestException as e:
-        print(f'Error updating IPs: {e}')
+        print('Update IPs failed, will retry in 30 seconds')
+        time.sleep(30)
+        return False
 
 
 if __name__ == '__main__':
@@ -40,4 +44,6 @@ if __name__ == '__main__':
     own_ip = sys.argv[1]
     sibling_ip = sys.argv[2]
 
-    update_ips(own_ip, sibling_ip)
+    updated = False
+    while not updated:
+        updated = update_ips(own_ip, sibling_ip)

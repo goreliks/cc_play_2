@@ -13,6 +13,8 @@ Resources:
           #!/bin/bash
           sudo apt update
           sudo apt install python3-flask -y
+          sudo apt install python3-pip -y
+          sudo pip3 install boto3 requests
           git clone https://github.com/goreliks/cc_play_2.git
           cd cc_play_2
           export FLASK_APP=app.py
@@ -29,6 +31,8 @@ Resources:
           #!/bin/bash
           sudo apt update
           sudo apt install python3-flask -y
+          sudo apt install python3-pip -y
+          sudo pip3 install boto3 requests
           git clone https://github.com/goreliks/cc_play_2.git
           cd cc_play_2
           export FLASK_APP=app.py
