@@ -178,15 +178,16 @@ def spawn_worker():
         sudo apt update
         sudo apt install python3-pip -y
         sudo pip3 install requests
-        cat <<EOF > /home/worker.py
+        cat <<EOF > ./worker.py
         {worker_code}
         EOF
-        nohup python3 /home/worker.py
+        nohup python3 ./worker.py
         '''
 
         response = ec2_worker.run_instances(
             ImageId=ami_id,
             InstanceType=instance_type,
+            Region='eu-west-1',
             InstanceInitiatedShutdownBehavior='terminate',
             MinCount=1,
             MaxCount=1,
