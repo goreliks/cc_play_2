@@ -14,10 +14,7 @@ workComplete = []
 maxNumOfWorkers = 3
 numOfWorkers = 0
 SIBLING_IP = None
-try:
-    OWN_IP = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4').text
-except:
-    OWN_IP = None
+OWN_IP = None
 processing_thread = None
 
 
@@ -57,7 +54,7 @@ def enqueue():
     # return jsonify({
     #     'task_id': task_id
     # })
-    return f'Task accepted {OWN_IP}', 200
+    return f'Task accepted', 200
 
 
 # ENDPOINT FOR WORKER TO PULL TASK
@@ -202,7 +199,7 @@ def spawn_worker():
             return True
 
     except Exception as e:
-        print(e)
+        print('Worker creation fail', e)
         return False
 
 

@@ -30,8 +30,8 @@ def update_ips(ip1, ip2):
         print('IPs updated successfully')
         return True
     except requests.exceptions.RequestException as e:
-        print('Update IPs failed, will retry in 30 seconds')
-        time.sleep(30)
+        print('In process...')
+        time.sleep(15)
         return False
 
 

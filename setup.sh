@@ -19,6 +19,7 @@ aws cloudformation wait stack-create-complete \
   --region $REGION
 echo "Stack created!"
 
+echo "Waiting for Flask web servers to be deployed..."
 # Get public IP address of EC2 instances
 INSTANCE_ID_1=$(aws cloudformation describe-stack-resources \
     --stack-name $STACK_NAME \
@@ -40,8 +41,8 @@ PUBLIC_IP_2=$(aws ec2 describe-instances \
     --query 'Reservations[0].Instances[0].PublicIpAddress' \
     --output text)
 
+python3 ./update_ips.py $PUBLIC_IP_1 $PUBLIC_IP_2
+
 echo "Flask web servers deployed successfully!"
 echo "The URL for the first web server is http://${PUBLIC_IP_1}:5000"
 echo "The URL for the second web server is http://${PUBLIC_IP_2}:5000"
-
-python3 ./update_ips.py $PUBLIC_IP_1 $PUBLIC_IP_2
