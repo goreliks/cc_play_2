@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import threading
 import boto3
+import requests
 
 app = Flask(__name__)
 
@@ -84,12 +85,35 @@ def pull_completed_tasks():
         return result
     else:
         try:
-            # TODO: ask the second node for results
-            # return otherNode.pullCompleteInternal(n)
+            url = f'http://{SIBLING_IP}:5000/pullCompletedInternal?top={number_of_completed_tasks}'
+            response = requests.post(url)
+            if response.status_code == 200:
+                data = response.json()
+                return data
             pass
         # TODO: check what to return if there are no results
         except:
             return []
+
+
+@app.route('/pullCompletedInternal', methods=['POST'])
+def pull_completed_tasks_internal():
+    number_of_completed_tasks_internal = int(request.args.get('top'))
+
+    if not number_of_completed_tasks_internal:
+        return 'Missing top parameter', 400
+
+    result = []
+    if len(workComplete) > number_of_completed_tasks_internal:
+        for i in range(number_of_completed_tasks_internal):
+            result.append(workComplete.pop())
+        return result
+    elif len(workComplete) > 0:
+        for i in range(len(workComplete)):
+            result.append(workComplete.pop())
+        return result
+    else:
+        return result
 
 
 @app.route('/workerDone', methods=['POST'])
@@ -114,10 +138,6 @@ def timer_for_new_worker():
             if numOfWorkers < maxNumOfWorkers:
                 if not spawn_worker():
                     continue
-            else:
-                # if otherNode.TryGetNodeQuota():
-                #     maxNumOfWorkers+=1
-                pass
         time.sleep(10)
 
 
