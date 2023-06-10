@@ -72,15 +72,13 @@ def pull_task():
 
 
 # ENDPOINT FOR WORKER TO PUTT COMPLETED TASK
-@app.route('/completed', methods=['PUT'])
+@app.route('/completed', methods=['POST'])
 def put_completed():
-    data = request.data.decode('utf-8')
-    if not data:
-        return 'Missing data parameters', 400
-
-    workComplete.append(data)
-
-    return 'Task accepted', 200
+    data = request.get_json()
+    if data:
+        workComplete.append(data)
+        return 'Task accepted', 200
+    return 'Missing data parameters', 400
 
 
 @app.route('/pullCompleted', methods=['POST'])
