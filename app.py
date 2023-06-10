@@ -16,6 +16,7 @@ numOfWorkers = 0
 SIBLING_IP = None
 OWN_IP = None
 processing_thread = None
+worker_list = []
 
 
 @app.route('/addIPs', methods=['PUT'])
@@ -184,7 +185,7 @@ def spawn_worker():
         nohup python3 ./worker.py
         '''
 
-        instance = ec2_worker.create_instances(
+        instances = ec2_worker.create_instances(
             ImageId=ami_id,
             InstanceType=instance_type,
             InstanceInitiatedShutdownBehavior='terminate',
@@ -193,15 +194,19 @@ def spawn_worker():
             UserData=user_data
         )
 
-        instance_id = instance[0].id
+        for instance in instances:
+            instance.wait_until_running()
+            instance.reload()
+            worker_list.append(instance.public_ip_address)
+
+            print('Worker created successfully', instance.public_ip_address)
+            global numOfWorkers
+            numOfWorkers += 1
+            return True
 
     except Exception as e:
         print('Worker creation fail', e)
         return False
-
-    global numOfWorkers
-    numOfWorkers += 1
-    return True
 
 
 if __name__ == '__main__':
