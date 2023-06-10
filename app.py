@@ -1,3 +1,4 @@
+import sys
 import time
 
 from flask import Flask, request, jsonify
@@ -11,7 +12,7 @@ app = Flask(__name__)
 
 workQueue = []
 workComplete = []
-maxNumOfWorkers = 3
+maxNumOfWorkers = 0
 numOfWorkers = 0
 SIBLING_IP = None
 OWN_IP = None
@@ -50,7 +51,7 @@ def enqueue():
         processing_th = threading.Thread(target=timer_for_new_worker, daemon=True)
         processing_th.start()
 
-    return f'Task accepted for: {data}', 200
+    return f'Task accepted for buffer: {data}', 200
 
 
 # ENDPOINT FOR WORKER TO PULL TASK

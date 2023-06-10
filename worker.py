@@ -53,7 +53,7 @@ def worker_done(node_ip):
 def loop():
     global nodes
     last_time = datetime.now()
-    while (datetime.now() - last_time).total_seconds() <= 30:
+    while (datetime.now() - last_time).total_seconds() <= 10*60:
         for node in nodes:
             work = give_me_work(node)
             if work:
