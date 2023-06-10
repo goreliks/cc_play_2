@@ -168,22 +168,17 @@ def spawn_worker():
         global OWN_IP
         global SIBLING_IP
 
-        own_ip = OWN_IP
-        sibling_ip = SIBLING_IP
-
         with open('worker.py', 'r') as file:
             worker_code = file.read()
 
         user_data = f'''#!/bin/bash
-        export PARENT_IP={own_ip}
-        export SIBLING_IP={sibling_ip}
         sudo apt update
         sudo apt install python3-pip -y
         sudo pip3 install requests
         cat <<EOF > ./worker.py
         {worker_code}
         EOF
-        nohup python3 ./worker.py
+        nohup python3 ./worker.py {OWN_IP} {SIBLING_IP}
         '''
 
         instances = ec2_worker.create_instances(
