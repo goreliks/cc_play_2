@@ -168,9 +168,7 @@ def spawn_worker():
         sudo apt update
         sudo apt install python3-pip -y
         sudo pip3 install requests
-        cat <<EOF > ./worker.py
-        {worker_code}
-        EOF
+        cat <<EOF > ./worker.py {worker_code} EOF
         nohup python3 ./worker.py {OWN_IP} {SIBLING_IP}
         '''
 
