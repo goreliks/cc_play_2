@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 workQueue = []
 workComplete = []
-maxNumOfWorkers = 3
+maxNumOfWorkers = 0
 numOfWorkers = 0
 SIBLING_IP = None
 OWN_IP = None
@@ -153,7 +153,8 @@ def timer_for_new_worker():
     while workQueue:
         if (datetime.now() - workQueue[-1][-1]).total_seconds() > 15:
             if numOfWorkers < maxNumOfWorkers:
-                if not spawn_worker():
+                worker = spawn_worker()
+                if not worker:
                     continue
         time.sleep(10)
 
