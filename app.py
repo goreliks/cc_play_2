@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 workQueue = []
 workComplete = []
-maxNumOfWorkers = 0
+maxNumOfWorkers = 3
 numOfWorkers = 0
 SIBLING_IP = None
 OWN_IP = None
