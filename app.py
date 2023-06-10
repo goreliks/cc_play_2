@@ -55,20 +55,20 @@ def enqueue():
     # return jsonify({
     #     'task_id': task_id
     # })
-    return f'Task accepted', 200
+    return 'Task accepted', 200
 
 
 # ENDPOINT FOR WORKER TO PULL TASK
 @app.route('/pullTask', methods=['GET'])
 def pull_task():
     if workQueue:
-        response = workQueue.pop()
+        response = workQueue.pop(0)
         return jsonify({
             'buffer': response[0],
             'iterations': response[1]
         })
     else:
-        return []
+        return jsonify({'message': 'No tasks available'}), 204
 
 
 # ENDPOINT FOR WORKER TO PUTT COMPLETED TASK
@@ -95,12 +95,12 @@ def pull_completed_tasks():
     result = []
     if len(workComplete) > number_of_completed_tasks:
         for i in range(number_of_completed_tasks):
-            result.append(workComplete.pop())
-        return result
+            result.append(workComplete.pop(0))
+        return jsonify(result)
     elif len(workComplete) > 0:
         for i in range(len(workComplete)):
-            result.append(workComplete.pop())
-        return result
+            result.append(workComplete.pop(0))
+        return jsonify(result)
     else:
         try:
             global SIBLING_IP
@@ -108,9 +108,11 @@ def pull_completed_tasks():
             response = requests.post(url)
             if response.status_code == 200:
                 data = response.json()
-                return data
+                return jsonify(data)
         except:
-            return []
+            return jsonify({'message': 'No tasks available'}), 204
+
+    return jsonify({'message': 'No tasks available'}), 204
 
 
 @app.route('/pullCompletedInternal', methods=['POST'])
@@ -123,14 +125,14 @@ def pull_completed_tasks_internal():
     result = []
     if len(workComplete) > number_of_completed_tasks_internal:
         for i in range(number_of_completed_tasks_internal):
-            result.append(workComplete.pop())
-        return result
+            result.append(workComplete.pop(0))
+        return jsonify(result)
     elif len(workComplete) > 0:
         for i in range(len(workComplete)):
-            result.append(workComplete.pop())
-        return result
+            result.append(workComplete.pop(0))
+        return jsonify(result)
     else:
-        return result
+        return jsonify({'message': 'No tasks available'}), 204
 
 
 @app.route('/workerDone', methods=['POST'])
