@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 workQueue = []
 workComplete = []
-maxNumOfWorkers = 0
+maxNumOfWorkers = 3
 numOfWorkers = 0
 SIBLING_IP = None
 OWN_IP = None
@@ -50,12 +50,7 @@ def enqueue():
         processing_th = threading.Thread(target=timer_for_new_worker, daemon=True)
         processing_th.start()
 
-    # # TODO: check if task_id below is relevant
-    # task_id = datetime.now().strftime('%Y%m%d%H%M%S%f')
-    # return jsonify({
-    #     'task_id': task_id
-    # })
-    return 'Task accepted', 200
+    return f'Task accepted for: {data}', 200
 
 
 # ENDPOINT FOR WORKER TO PULL TASK
@@ -88,8 +83,6 @@ def pull_completed_tasks():
     if not number_of_completed_tasks:
         return 'Missing top parameter', 400
 
-    # TODO: check if this is the correct way to return the results
-    # TODO: make that number_of_completed_tasks will be returner to the user even from other node (not MUST)
     result = []
     if len(workComplete) > number_of_completed_tasks:
         for i in range(number_of_completed_tasks):
@@ -156,7 +149,6 @@ def timer_for_new_worker():
                 worker = spawn_worker()
                 if not worker:
                     continue
-        time.sleep(10)
 
 
 def spawn_worker():
