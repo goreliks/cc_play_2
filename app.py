@@ -64,7 +64,7 @@ def pull_task():
             'iterations': response[1]
         })
     else:
-        return jsonify({'message': 'No tasks available'}), 204
+        return 'No tasks available', 204
 
 
 # ENDPOINT FOR WORKER TO PUTT COMPLETED TASK
@@ -102,9 +102,9 @@ def pull_completed_tasks():
                 data = response.json()
                 return jsonify(data)
         except:
-            return jsonify({'message': 'No tasks available'}), 204
+            return 'No tasks available', 204
 
-    return jsonify({'message': 'No tasks available'}), 204
+    return 'No tasks available', 204
 
 
 @app.route('/pullCompletedInternal', methods=['POST'])
@@ -124,7 +124,7 @@ def pull_completed_tasks_internal():
             result.append(workComplete.pop(0))
         return jsonify(result)
     else:
-        return jsonify({'message': 'No tasks available'}), 204
+        return 'No tasks available', 204
 
 
 @app.route('/workerDone', methods=['POST'])
@@ -183,19 +183,15 @@ EOF
             UserData=user_data
         )
 
-        for instance in instances:
-            instance.wait_until_running()
-            instance.reload()
-            worker_list.append(instance.public_ip_address)
-
-            print('Worker created successfully', instance.public_ip_address)
-            global numOfWorkers
-            numOfWorkers += 1
-            return True
+        time.sleep(30)
 
     except Exception as e:
         print('Worker creation fail', e)
         return False
+
+    global numOfWorkers
+    numOfWorkers += 1
+    return True
 
 
 if __name__ == '__main__':
