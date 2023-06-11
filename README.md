@@ -4,3 +4,6 @@
 * Verify you have configured aws cli tool on your machine
 * Clone the repo and enter the project folder ```cd cc_play_2/```
 * Execute ```./setup.sh``` for deployment
+
+## Document about Failure Modes and Effective Strategies for Resolution
+* failure-modes.pdf
