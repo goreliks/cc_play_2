@@ -35,8 +35,8 @@ Resources:
           sudo apt install python3-flask -y
           sudo apt install python3-pip -y
           sudo pip3 install boto3 requests
-          git clone https://github.com/goreliks/cc_play_2.git
-          cd cc_play_2
+          git clone https://github.com/goreliks/cloud_computing_ex2.git
+          cd cloud_computing_ex2
           export FLASK_APP=app.py
           nohup flask run --host=0.0.0.0 &
 
@@ -55,8 +55,8 @@ Resources:
           sudo apt install python3-flask -y
           sudo apt install python3-pip -y
           sudo pip3 install boto3 requests
-          git clone https://github.com/goreliks/cc_play_2.git
-          cd cc_play_2
+          git clone https://github.com/goreliks/cloud_computing_ex2.git
+          cd cloud_computing_ex2
           export FLASK_APP=app.py
           nohup flask run --host=0.0.0.0 &
 
