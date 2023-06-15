@@ -150,6 +150,9 @@ def timer_for_new_worker():
                 worker = spawn_worker()
                 if not worker:
                     continue
+                else:
+                    numOfWorkers += 1
+                    time.sleep(30)
 
 
 def spawn_worker():
@@ -183,14 +186,9 @@ EOF
             UserData=user_data
         )
 
-        time.sleep(30)
-
     except Exception as e:
         print('Worker creation fail', e)
         return False
-
-    global numOfWorkers
-    numOfWorkers += 1
     return True
 
 
