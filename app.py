@@ -152,7 +152,7 @@ def timer_for_new_worker():
                     continue
                 else:
                     numOfWorkers += 1
-                    time.sleep(30)
+        time.sleep(30)
 
 
 def spawn_worker():
